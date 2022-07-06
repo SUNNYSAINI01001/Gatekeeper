@@ -510,4 +510,4 @@ and found root.txt.
 
 ### Booomm!! Machine Solved
 
-![party](https://c.tenor.com/RJm6Z7-c0g4AAAAd/dancing-party.gif)
+![party](https://c.tenor.com/qe5OcoH-VxsAAAAC/funny-dance-indian-man-dance.gif)
