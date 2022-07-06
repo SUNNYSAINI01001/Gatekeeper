@@ -1,5 +1,4 @@
-``` Quick Note: In this CTF we are going to cover Buffer Overflow vulnerability, You can access this room on TryHackMe named as gatekeeper```
-
+# Gatekeeper Walkthrough
 
 ## Nmap
 
@@ -15,7 +14,7 @@ command=>
 
 Result => 
 
-![[nmap-initial-scan.png]]
+![nmap-initial-scan](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/nmap-initial-scan.png)
 
 ### Nmap final scan
 
@@ -161,7 +160,7 @@ command=>
 
 Result=>
 
-![[nmap-smb-share-enum.png]]
+![nmap-smb-share-enum](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/nmap-smb-share-enum.png)
 
 so here we found shares then i try to access Users share using smbclient.
 
@@ -172,11 +171,11 @@ command=>
 
 Result=>
 
-![[smbclient-User-access.png]]
+![smbclient-User-access](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/smclient-User-access.png)
 
 we are able to access Users, In this share i found two directory one is default and other is  Share. I go inside the Share directory and list the file and found gatekeeper.exe file.
 
-![[gatekeeper-found.png]]
+![gatekeeper-found](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/gatekeeper-found.png)
 
 Using mget i download this file in my local system.
 
@@ -193,19 +192,19 @@ so now first i load gatekeeper.exe in immunity debugger and in our kali machine 
 
 after connecting i enter some random text and on the output it shows Hello textweenter!!!
 
-![[nc-connect.png]]
+![nc-connect](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/nc-connect.png)
 
 Then using python i create 300 A's and try to enter this after entering this we found program got crash and register fill with bunch of A's i.e, 41
 
-![[nc-crash.png]]
+![nc-crash](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/nc-crash.png)
 
 POC of program crash=>
 
-![[fuzzing-crash-1.png]]
+![fuzzing-crash-1](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/fuzzing-crash-1.png)
 
 POC of register fill with A's (41)
 
-![[fuzzing-register41-2.png]]
+![fuzzing-register41-2](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/fuzzing-register41-2.png)
 
 Now the next step is to identify which part of the buffer that is being sent landing in the EIP register, in order to control the execution flow. For this we are going to use pattern_create.rb script.
 
@@ -259,7 +258,7 @@ Execute the script using command=>
 
 after executing the script we saw something like this
 
-![[pattern_create.png]]
+![pattern_create.png](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/pattern_create.png)
 
 and when we see in our  Immunity Debugger we found application got crashed.
 
@@ -271,7 +270,7 @@ Using mona to calculate the EIP offset, using command :
 
 Output :
 
-![[offset-mona-3.png]]
+![offset-mona-3](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/offset-mona-3.png)
 
 There are other method too for finding offset i.e, using pattern_offset.rb script.
 
@@ -283,7 +282,7 @@ here -l is length  and -q  is query , query is EIP value we got after using abov
 
 Using this script it shows the offset in just few seconds as you can see in the below image.
 
-![[pattern_offset.png]]
+![pattern_offset](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/pattern_offset.png)
 
 The reason behind doing this step is to verify is there enough space for the shellcode immediately after EIP,  which is what will be executed by the system in order to gain remote access. 
 Now lets update the script.
@@ -321,17 +320,17 @@ Now this time we can see EIP point to 42424242 which is 4 B's and all the 400 by
 
 POC of script work=>
 
-![[ID-5.png]]
+![ID-5](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/ID-5.png)
 
-![[EIP-BBBB-4.png]]
+![EIP-BBBB-4](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/EIP-BBBB-4.png)
 
-![[python400.png]]
+![python400](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/python400.png)
 
 On above and below image show ESP contain 400 C's we find these address on immunity debugger stack as given below.
 
-![[addrs1-6.png]]
+![addrs1-6](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/addrs1-6.png)
 
-![[addrs1-7.png]]
+![addrs1-7](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/addrs1-7.png)
 
 ## Bad Chars
 
@@ -343,15 +342,15 @@ command=>
 
 enter above command in immunity debugger in crash state as we all know \x00 is always in bad char that's why we specify this.
 
-![[bytearray00.png]]
+![bytearray00](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/bytearray00.png)
 
 Now i do a google search for bad chars and found all possible bad character i got a [reddit](https://www.reddit.com/r/python_netsec/comments/57gswn/generate_all_hex_chars_to_find_badchars/) page that have all bad char listed with a script too.
 
-![[hex_badchar.png]]
+![hex_badchar](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/hex_badchar.png)
 
 copy the all bad char or use the script to genrate bad char and set in payload variable in out exploit.py script we created before remember if you copy the bad char then it contains space may be they give us some issue. In my case i am using python script we got on reddit for generating bad char.
 
-![[badchar_result.png]]
+![badchar_result](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/badchar_result.png)
 
 Updated script=>
 
@@ -382,7 +381,7 @@ except:
 
 Restart the Immunity Debugger and re-attach gatekeeper script and run the script.
 
-![[ESP-addrs-findbadchar.png]]
+![ESP-addrs-findbadchar](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/ESP-addrs-findbadchar.png)
 
 The program got crashed check for bad char using below command on immunity debugger.
 
@@ -392,7 +391,7 @@ here,
 -f is used for file where we genrate bytearray before .
 -a is used for specify ESP address.
 
-![[got-bad-char.png]]
+![got-bad-char](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/got-bad-char.png)
 
 Here we found bad char 00 and 0a.
 Now the next step is find a valid JMP ESP instruction address so that we can redirect the execution of the application to our malicious shellcode.
@@ -405,7 +404,7 @@ command=>
 
 found DLL/module=>
 
-![[dll-found.png]]
+![dll-found](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/dll-found.png)
 
 look like there are two possible JMP ESP address
 set any one of the address to our exploit.py script in retn field on padding add nop (\x90) and generate a shell code using python.
@@ -468,17 +467,17 @@ now setup a netcat listner and start the application without the debugger and af
 
 POC=>
 
-![[program-without-debugger.png]]
+![program-without-debugger](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/program-without-debugger.png)
 
-![[shell.png]]
+![shell](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/shell.png)
 
 Now need to use this exploit on tryhackme machine create a new shellcode using msfvenom and specify your tun0 ip. copy the code and paste in exploit.py script don't forget to change ip to machine ip. Now start msfconsole and set payload and multi handler for connection.
 
-![[msfconsole.png]]
+![msfconsole](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/msfconsole.png)
 
 After running our exploit.py we got connection back to our handler.
 
-![[shell_real.png]]
+![shell_real](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/shell_real.png)
 
 We got a shell of user name natbat.
 
@@ -487,19 +486,19 @@ We got a shell of user name natbat.
 While performing enumeration of common files and folders, found out that Mozilla Firefox is installed on the box, so decided to use Metasploit to extract browser credentials.
 so first i background the current session using 'background' command and then using '/post/multi/gather/firefox_creds'  
 
-![[firefox_msfconsole.png]]
+![firefox_msfconsole](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/firefox_msfconsole.png)
 
 then i  set the session number and again run the exploit.
 
-![[firefox_creds.png]]
+![firefox_creds](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/firefox_creds.png)
 
 using [this](https://github.com/unode/firefox_decrypt) GitHub repository, credentials stored by Firefox can be decrypted.
 
-![[file.png]]
+![file](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/file.png)
 
 Then using the tool we download we decrypt the files and found username and password.
 
-![[root_creds.png]]
+![root_creds](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/root_creds.png)
 
 Using xfreerdp we connect the windows machine using command
 
@@ -507,6 +506,8 @@ Using xfreerdp we connect the windows machine using command
 
 and found root.txt.
 
-![[root.png]]
+![root](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/root.png)
 
 ### Booomm!! Machine Solved
+
+![party](https://c.tenor.com/RJm6Z7-c0g4AAAAd/dancing-party.gif)
