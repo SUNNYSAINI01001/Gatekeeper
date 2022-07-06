@@ -171,7 +171,7 @@ command=>
 
 Result=>
 
-![smbclient-User-access](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/smclient-User-access.png)
+![smbclient-User-access](https://raw.githubusercontent.com/SUNNYSAINI01001/Gatekeeper/main/Screenshot/smbclient-User-access.png)
 
 we are able to access Users, In this share i found two directory one is default and other is  Share. I go inside the Share directory and list the file and found gatekeeper.exe file.
 
